@@ -76,6 +76,8 @@ header p{color:var(--muted);font-size:13px;margin-top:4px;letter-spacing:.06em;t
 .prod .body .name{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .prod .body .cat{font-size:12px;color:var(--muted);margin-top:1px}
 .prod .body .price{font-weight:800;font-size:16px;margin-top:4px}
+.prod .body .notify-card-btn{display:flex;align-items:center;justify-content:center;gap:4px;width:100%;margin-top:8px;padding:7px 10px;border-radius:8px;background:var(--accent);color:#fff;font-size:12px;font-weight:600;border:none;cursor:pointer;transition:opacity .2s}
+.prod .body .notify-card-btn:hover{opacity:.85}
 
 /* ---- Empty ---- */
 .empty{text-align:center;color:var(--muted);padding:60px 20px;font-size:15px}
@@ -224,7 +226,8 @@ function money(n){return Number(n).toLocaleString('es-AR',{minimumFractionDigits
 function api(route,data){
   var opts={method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
     body:JSON.stringify(Object.assign({route:route},data?{data:data}:{}))};
-  return fetch(API_URL,opts).then(function(r){return r.json();});
+  var timeout=new Promise(function(_,reject){setTimeout(function(){reject(new Error('timeout'));},30000);});
+  return Promise.race([fetch(API_URL,opts).then(function(r){return r.json();}),timeout]);
 }
 
 function catName(catId){
@@ -328,6 +331,8 @@ function viewMain(){
           '<div class="name">'+esc(p.titulo)+'</div>'+
           '<div class="cat">'+esc(catName(p.categoria))+'</div>'+
           '<div class="price">$ '+money(p.precio)+'</div>'+
+          (oos&&!state.notifySent[p.id]?'<button class="notify-card-btn" onclick="event.stopPropagation();openModalNotify('+p.id+')">&#128276; Avisarme cuando haya stock</button>':'')+
+          (oos&&state.notifySent[p.id]?'<div style="margin-top:6px;font-size:11px;color:var(--green);font-weight:600;text-align:center">&#10003; Te avisamos</div>':'')+
         '</div>'+
       '</div>';
     });
@@ -426,9 +431,20 @@ function viewModal(){
 }
 
 /* ---- Notify form ---- */
+function openModalNotify(id){
+  var p=state.productos.filter(function(x){return x.id===id;})[0];
+  if(!p)return;
+  state.modalProd=p;
+  state.modalImg=0;
+  state.notifyForm={nombre:'',telefono:''};
+  render();
+  setTimeout(function(){var el=document.querySelector('.notify-form');if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});},100);
+}
+
 function showNotifyForm(){
   state.notifyForm={nombre:'',telefono:''};
   render();
+  setTimeout(function(){var el=document.querySelector('.notify-form');if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});},100);
 }
 
 function viewNotifyForm(p){
