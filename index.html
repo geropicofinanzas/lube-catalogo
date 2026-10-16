@@ -222,6 +222,12 @@ function toggleFav(id){
 
 function esc(s){var d=document.createElement('div');d.appendChild(document.createTextNode(s));return d.innerHTML;}
 function money(n){return Number(n).toLocaleString('es-AR',{minimumFractionDigits:0});}
+function proxyImg(url,size){
+  if(!url)return '';
+  var m=url.match(/googleusercontent\.com\/d\/([^?=\s]+)/);
+  if(m) return '/img/'+m[1]+(size?'?s='+size:'');
+  return url+(size?'='+size:'');
+}
 
 function api(route,data){
   var opts={method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
@@ -319,7 +325,7 @@ function viewMain(){
   } else {
     h+='<div class="grid">';
     list.forEach(function(p){
-      var thumb=p.fotos&&p.fotos.length?p.fotos[0].url+'=w400':'';
+      var thumb=p.fotos&&p.fotos.length?proxyImg(p.fotos[0].url,'w400'):'';
       var oos=isOutOfStock(p);
       h+='<div class="prod" onclick="openModal('+p.id+')">'+
         '<div class="img-wrap">'+
@@ -382,7 +388,7 @@ function viewModal(){
   // Galería
   if(fotos.length){
     h+='<div class="gallery">';
-    h+='<img src="'+esc(fotos[state.modalImg].url)+'=w800" alt="'+esc(p.titulo)+'">';
+    h+='<img src="'+esc(proxyImg(fotos[state.modalImg].url,'w800'))+'" alt="'+esc(p.titulo)+'">';
     if(fotos.length>1){
       h+='<button class="nav prev" onclick="event.stopPropagation();modalNav(-1)">&#8249;</button>';
       h+='<button class="nav next" onclick="event.stopPropagation();modalNav(1)">&#8250;</button>';
@@ -522,7 +528,7 @@ function viewFavDrawer(){
 
   var total=0;
   items.forEach(function(p){
-    var thumb=p.fotos&&p.fotos.length?p.fotos[0].url+'=w120':'';
+    var thumb=p.fotos&&p.fotos.length?proxyImg(p.fotos[0].url,'w120'):'';
     total+=Number(p.precio)||0;
     h+='<div class="fav-item">'+
       (thumb?'<img src="'+esc(thumb)+'" alt="'+esc(p.titulo)+'">':'<div style="width:60px;height:60px;background:var(--surface);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:24px;flex-shrink:0">&#128247;</div>')+
