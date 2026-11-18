@@ -326,9 +326,7 @@ function productsHtml(){
   if(state.busqueda.trim()){
     var q=state.busqueda.toLowerCase();
     list=list.filter(function(p){
-      return (p.titulo||'').toLowerCase().indexOf(q)!==-1||
-             (p.descripcion||'').toLowerCase().indexOf(q)!==-1||
-             catName(p.categoria).toLowerCase().indexOf(q)!==-1;
+      return (p.titulo||'').toLowerCase().indexOf(q)!==-1;
     });
   }
 
