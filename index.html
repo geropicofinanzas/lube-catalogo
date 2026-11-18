@@ -106,7 +106,7 @@ header p{color:var(--muted);font-size:13px;margin-top:4px;letter-spacing:.06em;t
 .modal .detail h2{font-size:26px;font-weight:700;margin:0 0 4px}
 .modal .detail .cat{color:var(--muted);font-size:13px;margin-bottom:10px}
 .modal .detail .price{font-size:24px;font-weight:800;margin-bottom:12px}
-.modal .detail .desc{color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:18px}
+.modal .detail .desc{color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:18px;white-space:pre-wrap}
 .modal .detail .out-of-stock{background:var(--redbg);color:var(--red);padding:12px 16px;border-radius:12px;text-align:center;font-weight:600;margin-bottom:14px}
 .modal .detail .actions{display:flex;gap:10px;flex-wrap:wrap}
 .modal .detail .actions .btn{
@@ -306,7 +306,19 @@ function viewMain(){
     h+='</div>';
   }
 
-  // Filtrar productos
+  // Contenedor dinámico para resultados (lo refresca setBusqueda sin tocar el input)
+  h+='<div id="prod-area">'+productsHtml()+'</div>';
+
+  // FAB favoritos
+  var favCount=state.favoritos.length;
+  if(favCount){
+    h+='<div class="fab"><button onclick="openFavs()">&#10084; Mis favoritos <span class="count">'+favCount+'</span></button></div>';
+  }
+
+  return h;
+}
+
+function productsHtml(){
   var list=state.productos;
   if(state.filtro!=='todas'){
     list=list.filter(function(p){return String(p.categoria)===state.filtro;});
@@ -320,42 +332,38 @@ function viewMain(){
     });
   }
 
-  if(!list.length){
-    h+='<div class="empty">No se encontraron productos.</div>';
-  } else {
-    h+='<div class="grid">';
-    list.forEach(function(p){
-      var thumb=p.fotos&&p.fotos.length?proxyImg(p.fotos[0].url,'w400'):'';
-      var oos=isOutOfStock(p);
-      h+='<div class="prod" onclick="openModal('+p.id+')">'+
-        '<div class="img-wrap">'+
-          (thumb?'<img src="'+esc(thumb)+'" alt="'+esc(p.titulo)+'" loading="lazy">':'<div class="no-img">&#128247;</div>')+
-          (oos?'<div class="stock-badge">Sin stock</div>':'')+
-        '</div>'+
-        '<button class="fav-btn'+(isFav(p.id)?' on':'')+'" onclick="event.stopPropagation();toggleFav('+p.id+')" title="Favorito">'+(isFav(p.id)?'&#10084;':'&#9825;')+'</button>'+
-        '<div class="body">'+
-          '<div class="name">'+esc(p.titulo)+'</div>'+
-          '<div class="cat">'+esc(catName(p.categoria))+'</div>'+
-          '<div class="price">$ '+money(p.precio)+'</div>'+
-          (oos&&!state.notifySent[p.id]?'<button class="notify-card-btn" onclick="event.stopPropagation();openModalNotify('+p.id+')">&#128276; Avisarme cuando haya stock</button>':'')+
-          (oos&&state.notifySent[p.id]?'<div style="margin-top:6px;font-size:11px;color:var(--green);font-weight:600;text-align:center">&#10003; Te avisamos</div>':'')+
-        '</div>'+
-      '</div>';
-    });
-    h+='</div>';
-  }
+  if(!list.length) return '<div class="empty">No se encontraron productos.</div>';
 
-  // FAB favoritos
-  var favCount=state.favoritos.length;
-  if(favCount){
-    h+='<div class="fab"><button onclick="openFavs()">&#10084; Mis favoritos <span class="count">'+favCount+'</span></button></div>';
-  }
-
+  var h='<div class="grid">';
+  list.forEach(function(p){
+    var thumb=p.fotos&&p.fotos.length?proxyImg(p.fotos[0].url,'w400'):'';
+    var oos=isOutOfStock(p);
+    h+='<div class="prod" onclick="openModal('+p.id+')">'+
+      '<div class="img-wrap">'+
+        (thumb?'<img src="'+esc(thumb)+'" alt="'+esc(p.titulo)+'" loading="lazy">':'<div class="no-img">&#128247;</div>')+
+        (oos?'<div class="stock-badge">Sin stock</div>':'')+
+      '</div>'+
+      '<button class="fav-btn'+(isFav(p.id)?' on':'')+'" onclick="event.stopPropagation();toggleFav('+p.id+')" title="Favorito">'+(isFav(p.id)?'&#10084;':'&#9825;')+'</button>'+
+      '<div class="body">'+
+        '<div class="name">'+esc(p.titulo)+'</div>'+
+        '<div class="cat">'+esc(catName(p.categoria))+'</div>'+
+        '<div class="price">$ '+money(p.precio)+'</div>'+
+        (oos&&!state.notifySent[p.id]?'<button class="notify-card-btn" onclick="event.stopPropagation();openModalNotify('+p.id+')">&#128276; Avisarme cuando haya stock</button>':'')+
+        (oos&&state.notifySent[p.id]?'<div style="margin-top:6px;font-size:11px;color:var(--green);font-weight:600;text-align:center">&#10003; Te avisamos</div>':'')+
+      '</div>'+
+    '</div>';
+  });
+  h+='</div>';
   return h;
 }
 
+function refreshProducts(){
+  var el=document.getElementById('prod-area');
+  if(el) el.innerHTML=productsHtml();
+}
+
 function setFiltro(v){state.filtro=v;render();}
-function setBusqueda(v){state.busqueda=v;render();}
+function setBusqueda(v){state.busqueda=v;refreshProducts();}
 
 /* ---- Modal producto ---- */
 function openModal(id){
