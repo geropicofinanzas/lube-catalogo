@@ -106,12 +106,13 @@ header p{color:var(--muted);font-size:13px;margin-top:4px;letter-spacing:.06em;t
 .modal .detail h2{font-size:26px;font-weight:700;margin:0 0 4px}
 .modal .detail .cat{color:var(--muted);font-size:13px;margin-bottom:10px}
 .modal .detail .price-box{margin-bottom:14px}
-.modal .detail .price-main{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-.modal .detail .price-main .amount{font-size:24px;font-weight:800}
-.modal .detail .price-main .tag{font-size:12px;font-weight:700;background:var(--surface);color:var(--ink);padding:4px 10px;border-radius:999px;border:1px solid var(--line);white-space:nowrap}
-.modal .detail .price-cash{display:flex;align-items:baseline;gap:8px;margin-top:6px;color:var(--muted)}
-.modal .detail .price-cash .amount{font-size:16px;font-weight:700;color:var(--ink)}
-.modal .detail .price-cash .tag{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.modal .detail .price-main{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.modal .detail .price-main .amount{font-size:24px;font-weight:800;line-height:1}
+.modal .detail .price-main .tag{font-size:12px;font-weight:700;background:var(--surface);color:var(--ink);padding:5px 10px;border-radius:999px;border:1px solid var(--line);white-space:nowrap;line-height:1}
+.modal .detail .price-cash{display:flex;align-items:center;gap:8px;margin-top:8px;color:var(--muted);flex-wrap:wrap}
+.modal .detail .price-cash .amount{font-size:16px;font-weight:700;color:var(--ink);line-height:1}
+.modal .detail .price-cash .tag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;line-height:1}
+.modal .detail .price-cash .off{background:var(--accent);color:#fff;font-size:11px;font-weight:800;padding:3px 8px;border-radius:999px;letter-spacing:.03em;line-height:1}
 .modal .detail .desc{color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:18px;white-space:pre-wrap}
 .modal .detail .out-of-stock{background:var(--redbg);color:var(--red);padding:12px 16px;border-radius:12px;text-align:center;font-weight:600;margin-bottom:14px}
 .modal .detail .actions{display:flex;gap:10px;flex-wrap:wrap}
@@ -417,7 +418,7 @@ function viewModal(){
   var precioEfectivo=Math.round((Number(p.precio)||0)*0.9);
   h+='<div class="price-box">'+
        '<div class="price-main"><span class="amount">$ '+money(p.precio)+'</span><span class="tag">3 cuotas sin interés</span></div>'+
-       '<div class="price-cash"><span class="amount">$ '+money(precioEfectivo)+'</span><span class="tag">efectivo</span></div>'+
+       '<div class="price-cash"><span class="amount">$ '+money(precioEfectivo)+'</span><span class="off">10% OFF</span><span class="tag">Efectivo o transferencia</span></div>'+
      '</div>';
   if(p.descripcion) h+='<div class="desc">'+esc(p.descripcion)+'</div>';
 

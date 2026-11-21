@@ -1,4 +1,4 @@
-var CACHE = 'lube-cat-v8';
+var CACHE = 'lube-cat-v9';
 var ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './icon-180.png', './logo-lube.png'];
 
 self.addEventListener('install', function (e) {
